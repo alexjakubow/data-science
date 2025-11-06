@@ -1,0 +1,87 @@
+---
+title: Reproducibility Report
+subtitle: Monthly Reports
+author: "Alex Jakubow"
+date: "`r Sys.Date()`"
+format:
+  pdf:
+    toc: true
+    toc_depth: 2
+---
+
+# Overview
+
+Reproducibilty report info for  `data-science/Monthly_Reports` scripts.
+
+
+# `metric_data_updates.R`
+
+## Issues
+
+### Installing/Restoring `renv`
+
+Issue: `renv::restore()` failed on `Matrix` package
+
+Output: 
+```
+Error:
+! error in pak subprocess
+Caused by error in `stop_task_build(state, worker)`:
+! Failed to build source package Matrix.
+Full installation output:
+* installing *source* package ‘Matrix’ ...
+** this is package ‘Matrix’ version ‘1.7-1’
+** package ‘Matrix’ successfully unpacked and MD5 sums checked
+staged installation is only possible with locking
+** using non-staged installation
+** libs
+using C compiler: ‘Apple clang version 17.0.0 (clang-1700.0.13.5)’
+using SDK: ‘MacOSX15.5.sdk’
+clang -arch arm64 -I"/Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/include" -DNDEBUG -I"SuiteSparse/SuiteSparse_config"  -I/opt/R/arm64/include   -fvisibility=hidden -fPIC  -falign-functions=64 -Wall -g -O2  -Wall -pedantic -fdiagnostics-color=always -c Csparse.c -o Csparse.o
+In file included from Csparse.c:1:
+./Mdefines.h:41:11: fatal error: 'libintl.h' file not found
+   41 | # include <libintl.h>
+      |           ^~~~~~~~~~~
+1 error generated.
+make: *** [Csparse.o] Error 1
+ERROR: compilation failed for package ‘Matrix’
+* removing ‘/private/var/folders/p9/kr0r1brn59995m7w8m3x7qp00000gp/T/Rtmpf1uCVz/pkg-lib67f067d4ab25/Matrix’
+```
+
+Solution: Remove and reinstall `renv`
+
+Solution-Method:
+
+1. Manually deleted `renv`, `renv.lock`, and `.RProfile`
+2. Reinstalled `renv` using `renv::install()`
+
+Consequences:
+
+- Lockfile updated to R 4.5.0
+
+### Writing/Appending to Google Sheets
+
+Issues/Assumptions:
+
+- Everyone has access to the production and testing sheets
+- Because`sheet_append()` does not write header names, it won't work when writing header names to a new (or existing, but empty) sheet
+
+Solutions:
+
+- Alex requested write access to the production sheets
+- Generated a set of testing sheets for DS access on Google Drive at "data-science-locked/testing"
+- Simplified logic for running on testing sheets or production sheets
+- Wrote exception handler for `sheet_append()`: `sheet_write()` if not existing, `sheet_append()` if existing.
+
+## Ergonomic Changes
+
+- Subdivided code into sections for preamble, functions, and main and migrated code accordingly:
+  - Moved authentication call to MAIN
+- R now supports the pipe operator natively, so replace all `%>%` with `|>`
+- QUESTION: Should we use a linter for our R scripts?
+
+## Session Info
+```{r}
+sessioninfo::session_info()
+sessioninfo::session_info(to_file = "session.log")
+``` 

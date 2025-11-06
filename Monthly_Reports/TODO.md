@@ -1,0 +1,4 @@
+- [x] Parameterize writing to prod vs. test sheets
+- [x] Add exception handler for `sheet_append()`
+- [ ] Confirm all can access production sheets
+- [ ] Automated writing to prod and test sheets
